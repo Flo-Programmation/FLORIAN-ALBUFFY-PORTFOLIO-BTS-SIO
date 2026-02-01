@@ -1,35 +1,181 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/actualites.css">
     <title>Veille & Actualités</title>
-</head>
-<body>
-    <div class="container">
-        <!-- HEADER -->
-        <header class="header">
-            <h1>Veille & Actualités</h1>
-            <p class="subtitle">Restez informé avec les dernières actualités technologiques</p>
-            <div class="divider"></div>
-        </header>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- LOADING -->
-        <div id="loading" class="loading">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">Chargement des actualités en cours...</p>
-        </div>
+    <style>
+        /* RESET */
+        * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
 
-        <!-- NEWS GRID -->
-        <section id="news" class="news-grid" style="display: none;"></section>
+        body {
+        background: #ffffff;
+        color: #e5e7eb;
+        padding: 40px;
+        }
 
-        <!-- FOOTER -->
-        <footer class="footer">
-            <p>© 2026 – Veille technologique alimentée par flux RSS automatisé</p>
-        </footer>
-    </div>
+        h1 {
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 2.2rem;
+        }
 
-    <script src="../js/news.js"></script>
-</body>
-</html>
+        .subtitle {
+        text-align: center;
+        margin-bottom: 40px;
+        color: #94a3b8;
+        }
+
+        .news-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        max-width: 1100px;
+        margin: auto;
+        }
+
+        .card {
+        background: #020617;
+        border-radius: 14px;
+        padding: 20px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+        line-height: 1.4;
+        }
+
+        .card a {
+        color: #38bdf8;
+        text-decoration: none;
+        }
+
+        .card a:hover {
+        text-decoration: underline;
+        }
+
+        .date {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        }
+
+        .loading {
+        text-align: center;
+        font-size: 1.1rem;
+        margin-top: 50px;
+        color: #94a3b8;
+        }
+
+        footer {
+        text-align: center;
+        margin-top: 60px;
+        font-size: 0.85rem;
+        color: #64748b;
+        }
+
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            }
+
+            .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            }
+
+    </style>
+    </head>
+
+    <body>
+
+    <h1>📰 Veille & Actualités</h1>
+    <p class="subtitle">Flux automatisé – sources externes</p>
+
+    <div id="loading" class="loading">Chargement des actualités...</div>
+    <section id="news" class="news-grid"></section>
+
+    <footer>
+        © 2026 – Veille technologique intégrée via flux RSS
+    </footer>
+
+    <script>
+    const rssUrl = "https://rss.app/feeds/MhoabB3WS4ePO0Sc.xml";
+    const apiUrl = "https://corsproxy.io/?" + encodeURIComponent(rssUrl);
+
+    fetch(apiUrl)
+    .then(res => res.text())
+    .then(str => new DOMParser().parseFromString(str, "text/xml"))
+    .then(data => {
+        const items = data.querySelectorAll("item");
+        const container = document.getElementById("news");
+        const loading = document.getElementById("loading");
+
+        loading.style.display = "none";
+
+        items.forEach((item, index) => {
+        if (index >= 18) return;
+
+        const title = item.querySelector("title")?.textContent ?? "Sans titre";
+        const link = item.querySelector("link")?.textContent ?? "#";
+        const date = item.querySelector("pubDate")?.textContent ?? "";
+
+        // 🔥 Récupération image RSS.APP (media:content / media:thumbnail)
+        let image = null;
+
+        [...item.children].forEach(el => {
+            if (
+            el.tagName.includes("media:content") ||
+            el.tagName.includes("media:thumbnail")
+            ) {
+            image = el.getAttribute("url");
+            }
+        });
+
+        // fallback si aucune image
+        if (!image) {
+            image = "https://placehold.co/600x300/020617/ffffff?text=Actualité";
+        }
+
+        container.innerHTML += `
+            <article class="card">
+            <img src="${image}" alt="${title}" loading="lazy">
+            <div class="card-content">
+                <h3>
+                <a href="${link}" target="_blank" rel="noopener">
+                    ${title}
+                </a>
+                </h3>
+                <p class="date">${date}</p>
+            </div>
+            </article>
+        `;
+        });
+    })
+    .catch(err => {
+        document.getElementById("loading").textContent =
+        "Erreur lors du chargement des actualités.";
+        console.error(err);
+    });
+    </script>
+
+
+    </body>
+    </html>
