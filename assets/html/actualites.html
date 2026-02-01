@@ -1,181 +1,451 @@
-    <!DOCTYPE html>
-    <html lang="fr">
-    <head>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
     <meta charset="UTF-8">
     <title>Veille & Actualités</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    
     <style>
-        /* RESET */
+        /* RESET & BASE */
         * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-        background: #ffffff;
-        color: #e5e7eb;
-        padding: 40px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1a202c;
         }
 
-        h1 {
-        text-align: center;
-        margin-bottom: 10px;
-        font-size: 2.2rem;
+        /* CONTAINER */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .subtitle {
-        text-align: center;
-        margin-bottom: 40px;
-        color: #94a3b8;
+        /* HEADER */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
         }
 
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            color: #718096;
+            font-weight: 400;
+        }
+
+        .header .divider {
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            margin: 20px auto 0;
+            border-radius: 2px;
+        }
+
+        /* LOADING STATE */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            color: #4a5568;
+        }
+
+        /* NEWS GRID */
         .news-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 20px;
-        max-width: 1100px;
-        margin: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
         }
 
+        /* CARD */
         .card {
-        background: #020617;
-        border-radius: 14px;
-        padding: 20px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
         }
 
-        .card h3 {
-        font-size: 1.1rem;
-        margin-bottom: 12px;
-        line-height: 1.4;
+        .card:hover::before {
+            opacity: 1;
         }
 
-        .card a {
-        color: #38bdf8;
-        text-decoration: none;
-        }
-
-        .card a:hover {
-        text-decoration: underline;
-        }
-
-        .date {
-        font-size: 0.85rem;
-        color: #94a3b8;
-        }
-
-        .loading {
-        text-align: center;
-        font-size: 1.1rem;
-        margin-top: 50px;
-        color: #94a3b8;
-        }
-
-        footer {
-        text-align: center;
-        margin-top: 60px;
-        font-size: 0.85rem;
-        color: #64748b;
-        }
-
-        .card img {
+        .card-image {
             width: 100%;
-            height: 180px;
+            height: 220px;
             object-fit: cover;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            }
+            transition: transform 0.3s ease;
+        }
 
-            .card-content {
+        .card:hover .card-image {
+            transform: scale(1.05);
+        }
+
+        .card-image-container {
+            overflow: hidden;
+            background: #f7fafc;
+            position: relative;
+        }
+
+        .card-content {
+            padding: 24px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            }
-
-    </style>
-    </head>
-
-    <body>
-
-    <h1>📰 Veille & Actualités</h1>
-    <p class="subtitle">Flux automatisé – sources externes</p>
-
-    <div id="loading" class="loading">Chargement des actualités...</div>
-    <section id="news" class="news-grid"></section>
-
-    <footer>
-        © 2026 – Veille technologique intégrée via flux RSS
-    </footer>
-
-    <script>
-    const rssUrl = "https://rss.app/feeds/MhoabB3WS4ePO0Sc.xml";
-    const apiUrl = "https://corsproxy.io/?" + encodeURIComponent(rssUrl);
-
-    fetch(apiUrl)
-    .then(res => res.text())
-    .then(str => new DOMParser().parseFromString(str, "text/xml"))
-    .then(data => {
-        const items = data.querySelectorAll("item");
-        const container = document.getElementById("news");
-        const loading = document.getElementById("loading");
-
-        loading.style.display = "none";
-
-        items.forEach((item, index) => {
-        if (index >= 18) return;
-
-        const title = item.querySelector("title")?.textContent ?? "Sans titre";
-        const link = item.querySelector("link")?.textContent ?? "#";
-        const date = item.querySelector("pubDate")?.textContent ?? "";
-
-        // 🔥 Récupération image RSS.APP (media:content / media:thumbnail)
-        let image = null;
-
-        [...item.children].forEach(el => {
-            if (
-            el.tagName.includes("media:content") ||
-            el.tagName.includes("media:thumbnail")
-            ) {
-            image = el.getAttribute("url");
-            }
-        });
-
-        // fallback si aucune image
-        if (!image) {
-            image = "https://placehold.co/600x300/020617/ffffff?text=Actualité";
+            flex-grow: 1;
         }
 
-        container.innerHTML += `
-            <article class="card">
-            <img src="${image}" alt="${title}" loading="lazy">
-            <div class="card-content">
-                <h3>
-                <a href="${link}" target="_blank" rel="noopener">
-                    ${title}
-                </a>
-                </h3>
-                <p class="date">${date}</p>
-            </div>
-            </article>
-        `;
-        });
-    })
-    .catch(err => {
-        document.getElementById("loading").textContent =
-        "Erreur lors du chargement des actualités.";
-        console.error(err);
-    });
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            color: #2d3748;
+        }
+
+        .card-title a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .card-title a:hover {
+            color: #667eea;
+        }
+
+        .card-date {
+            font-size: 0.9rem;
+            color: #a0aec0;
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-date::before {
+            content: '📅';
+            font-size: 0.85rem;
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            color: #718096;
+            font-size: 0.95rem;
+        }
+
+        /* ERROR STATE */
+        .error {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .error-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .error-text {
+            font-size: 1.1rem;
+            color: #e53e3e;
+            font-weight: 500;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header .subtitle {
+                font-size: 1rem;
+            }
+
+            .news-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            body {
+                padding: 15px;
+            }
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 1.1rem;
+            color: #718096;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header class="header">
+            <h1>Veille & Actualités</h1>
+            <p class="subtitle">Restez informé avec les dernières actualités technologiques</p>
+            <div class="divider"></div>
+        </header>
+
+        <!-- LOADING -->
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Chargement des actualités en cours...</p>
+        </div>
+
+        <!-- NEWS GRID -->
+        <section id="news" class="news-grid" style="display: none;"></section>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p>© 2026 – Veille technologique alimentée par flux RSS automatisé</p>
+        </footer>
+    </div>
+
+    <script>
+        const rssUrl = "https://rss.app/feeds/MhoabB3WS4ePO0Sc.xml";
+
+        // Format date in French
+        function formatDate(dateString) {
+            if (!dateString) return 'Date inconnue';
+            
+            try {
+                const date = new Date(dateString);
+                const options = { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                return date.toLocaleDateString('fr-FR', options);
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        // Extract image from description HTML
+        function extractImageFromDescription(description) {
+            if (!description) return null;
+            
+            // Try to find img tag
+            const imgMatch = description.match(/<img[^>]+src=["']([^"']+)["']/i);
+            if (imgMatch && imgMatch[1]) return imgMatch[1];
+            
+            // Try to find any URL that looks like an image
+            const urlMatch = description.match(/(https?:\/\/[^\s<>"]+?\.(?:jpg|jpeg|png|gif|webp))/i);
+            if (urlMatch && urlMatch[1]) return urlMatch[1];
+            
+            return null;
+        }
+
+        // Display news from JSON format
+        function displayNewsFromJSON(data) {
+            const container = document.getElementById("news");
+            const loading = document.getElementById("loading");
+
+            console.log('Feed data:', data);
+
+            loading.style.display = "none";
+            container.style.display = "grid";
+
+            if (!data.items || data.items.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">📭</div>
+                        <p class="empty-state-text">Aucune actualité disponible pour le moment.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const itemsToShow = data.items.slice(0, 18);
+            
+            itemsToShow.forEach((item) => {
+                const title = item.title || "Sans titre";
+                const link = item.link || item.url || "#";
+                const pubDate = item.pubDate || item.published || "";
+                
+                // Try multiple ways to get the image
+                let image = item.enclosure?.link || 
+                           item.enclosure?.url ||
+                           item.thumbnail ||
+                           item.image ||
+                           extractImageFromDescription(item.description || item.content);
+
+                // Fallback image
+                if (!image) {
+                    image = `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&h=400&fit=crop&auto=format&q=80`;
+                }
+
+                const formattedDate = formatDate(pubDate);
+
+                container.innerHTML += `
+                    <article class="card">
+                        <div class="card-image-container">
+                            <img src="${image}" alt="${title}" class="card-image" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&h=400&fit=crop&auto=format&q=80'">
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">
+                                <a href="${link}" target="_blank" rel="noopener noreferrer">
+                                    ${title}
+                                </a>
+                            </h3>
+                            <p class="card-date">${formattedDate}</p>
+                        </div>
+                    </article>
+                `;
+            });
+        }
+
+        // Fetch RSS using rss2json API (GitHub Pages compatible)
+        async function fetchRSS() {
+            // List of API endpoints to try
+            const apis = [
+                `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`,
+                `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`,
+            ];
+
+            for (let i = 0; i < apis.length; i++) {
+                try {
+                    console.log(`Trying API ${i + 1}:`, apis[i]);
+                    const response = await fetch(apis[i]);
+                    
+                    if (!response.ok) {
+                        console.log(`API ${i + 1} failed with status:`, response.status);
+                        continue;
+                    }
+
+                    const data = await response.json();
+                    console.log('Response data:', data);
+
+                    // Handle rss2json format
+                    if (data.status === 'ok' && data.items) {
+                        displayNewsFromJSON(data);
+                        return;
+                    }
+
+                    // Handle allorigins format
+                    if (data.contents) {
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+                        const items = xmlDoc.querySelectorAll("item");
+                        
+                        // Convert XML items to JSON format
+                        const jsonData = {
+                            items: Array.from(items).map(item => ({
+                                title: item.querySelector("title")?.textContent,
+                                link: item.querySelector("link")?.textContent,
+                                pubDate: item.querySelector("pubDate")?.textContent,
+                                description: item.querySelector("description")?.textContent,
+                            }))
+                        };
+                        
+                        displayNewsFromJSON(jsonData);
+                        return;
+                    }
+
+                } catch (error) {
+                    console.log(`API ${i + 1} error:`, error);
+                    continue;
+                }
+            }
+
+            // All APIs failed
+            const loading = document.getElementById("loading");
+            loading.innerHTML = `
+                <div class="error">
+                    <div class="error-icon">⚠️</div>
+                    <p class="error-text">Impossible de charger les actualités pour le moment.</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem; color: #a0aec0;">
+                        Le flux RSS est temporairement indisponible. Veuillez réessayer dans quelques instants.
+                    </p>
+                </div>
+            `;
+        }
+
+        // Start fetching
+        fetchRSS();
     </script>
-
-
-    </body>
-    </html>
+</body>
+</html>
