@@ -619,30 +619,24 @@
 
         <!--==================== ACTUALITES ====================-->
             <section class="actualites">
-        <h2>🌐 Veille & Actualités</h2>
-        <span class="section__subtitle">Restez informé des dernières nouveautés technologiques !</span>
-        
-        <div id="status" class="status-message">
-            <div class="loading-spinner"></div>
-            <p>Chargement des actualités en cours...</p>
-        </div>
+                <h2>Veille & Actualités</h2>
+                <span class="section__subtitle">Restez informer des nouveautés !</span>
+                <div class="carousel">
+                    <div id="track-top" class="track"></div>
+                </div>
+                <br>
+                <div class="carousel">
+                    <div id="track-bottom" class="track reverse"></div>
+                </div>
 
-        <div id="carousel-container" style="display: none;">
-            <div class="carousel">
-                <div id="track-top" class="track"></div>
-            </div>
-            <br>
-            <div class="carousel">
-                <div id="track-bottom" class="track reverse"></div>
-            </div>
-
-            <div class="bouton">
-                <button onclick="window.open('https://rss.app/feeds/MhoabB3WS4ePO0Sc.xml', '_blank')">
-                    Voir tous les articles
-                </button>
-            </div>
-        </div>
-    </section>
+                <div class="bouton">
+                    <a href="assets/html/actualites.html" target="_blank">
+                        <button>
+                            Voir tout les articles
+                        </button>
+                    </a>
+                </div>
+            </section>
 
         <!--==================== FOOTER ====================-->
         <footer class="footer">
@@ -702,4 +696,5 @@
         <script src="assets/js/caroussel-news.js"></script>
     </body>
 </html>
+
 
